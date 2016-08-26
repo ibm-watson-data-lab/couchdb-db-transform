@@ -31,7 +31,8 @@ $ cf set-env couchdb-db-transform TRANSFORM_FUNCTION </path/to/custom_transform_
 
 ```
 $ cf start couchdb-db-transform
-...
+  ...
+$ cf logs couchdb-db-transform --recent  
 
 ```
 
@@ -42,7 +43,7 @@ $ cf start couchdb-db-transform
 This service provides a basic service status console. 
 > To disable the console, set environment variable `HIDE_CONSOLE` to `true`.
 
-Launch a web browser and open the servide status page `<service-url>/status`, replacing `<service_url> with the URL that was assigned to your service instance.
+Launch a web browser and open the servide status page `<service-url>/status`, replacing `<service_url>` with the URL that was assigned to your service instance.
 
 Example: `https://couchdb-db-transform.mybluemix.net/status`
 
@@ -55,11 +56,12 @@ Example: `https://couchdb-db-transform.mybluemix.net/status`
 $ git clone https://github.com/ibm-cds-labs/couchdb-db-transform.git
 $ cd couchdb-db-transform
 $ npm install
-$ set SOURCE_COUCH_DB_URL https://$USERNAME:$PASSWORD@$REMOTE_USERNAME.cloudant.com/$SOURCE_DATABASE_NAME
-$ set TARGET_COUCH_DB_URL https://$USERNAME:$PASSWORD@$REMOTE_USERNAME.cloudant.com/$TARGET_DATABASE_NAME
-$ set TRANSFORM_FUNCTION sample_transform_function/no_transformation.js
+  ...
+$ export SOURCE_COUCH_DB_URL=https://$USERNAME:$PASSWORD@$REMOTE_USERNAME.cloudant.com/$SOURCE_DATABASE_NAME
+$ export TARGET_COUCH_DB_URL=https://$USERNAME:$PASSWORD@$REMOTE_USERNAME.cloudant.com/$TARGET_DATABASE_NAME
+$ export TRANSFORM_FUNCTION=sample_transform_function/no_transformation.js
 $ node app.js
-...
+  ...
 ```
 
 #### Monitor the status
