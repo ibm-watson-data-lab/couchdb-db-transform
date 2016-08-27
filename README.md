@@ -1,8 +1,12 @@
 # couchdb-db-transform
 
+![build status](https://travis-ci.org/ibm-cds-labs/couchdb-db-transform.svg?branch=master)
+
 Copies documents from one CouchDB database to another CouchDB database, applying one or more optionally configured transformations to the documents.
 
 ![Overview](https://raw.githubusercontent.com/ibm-cds-labs/couchdb-db-transform/master/media/flow.png)
+
+Inspired by [couchimport](https://www.npmjs.com/package/couchimport).
 
 ## Getting started
 
