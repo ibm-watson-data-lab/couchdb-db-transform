@@ -3,6 +3,6 @@ applications:
   memory: 256M
   instances: 1
   domain: mybluemix.net
-  name: couchdb-db-transform-service
-  host: couchdb-db-transform-service
+  name: couchdb-db-copy-and-transform-service
+  host: couchdb-db-copy-and-transform-service
   disk_quota: 1024M
