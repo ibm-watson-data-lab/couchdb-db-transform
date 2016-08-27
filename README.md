@@ -23,9 +23,13 @@ $ cf set-env couchdb-db-copy-and-transform-service TARGET_COUCH_DB_URL https://$
 
 #### Optional: Declare the transformation functions
 
+A custom transformation function can be used to modify the source document before it is saved in the target database.
+
 ```
 $ cf set-env couchdb-db-copy-and-transform-service TRANSFORM_FUNCTION </path/to/custom_transform_function.js>
 ```
+
+> Simple example transformation functions are located in the `sample_transform_functions` directory.
 
 #### Start the service
 
