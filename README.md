@@ -2,6 +2,8 @@
 
 Copies documents from one CouchDB database to another CouchDB database, applying one or more optionally configured transformations to the documents.
 
+![Overview](https://raw.githubusercontent.com/ibm-cds-labs/couchdb-db-transform/master/media/flow.png)
+
 ## Getting started
 
 ### Deploy the service in Bluemix
