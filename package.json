@@ -1,0 +1,47 @@
+{
+  "name": "couchdb-db-transform",
+  "version": "0.0.1",
+  "description": "Fetches documents from one couchdb database, optionally transforms them and inserts them into target database",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "test": "grunt",
+    "tests-unit": "grunt"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ibm-cds-labs/couchdb-db-transform"
+  },
+  "keywords": [
+    "couchdb",
+    "cloudant",
+    "replication",
+    "transformation"
+  ],
+  "author": "Patrick Titzler <ptitzler@us.ibm.com>",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "async": "^2.0.1",
+    "body-parser": "^1.15.2",
+    "cfenv": "^1.0.3",
+    "cloudant": "^1.4.3",
+    "debug": "^2.2.0",
+    "events": "^1.1.1",
+    "express": "^4.14.0",
+    "fs": "0.0.2",
+    "lodash": "^4.15.0",
+    "path": "^0.12.7",
+    "redis": "^2.6.2",
+    "util": "^0.10.3"
+  },
+  "devDependencies": {
+    "assert": "^1.4.1",
+    "grunt": "0.4.5",
+    "grunt-cli": "0.1.13",
+    "grunt-contrib-jshint": "0.12.0",
+    "grunt-jscs": "2.8.0",
+    "grunt-mocha": "^1.0.2",
+    "jshint": "2.8.0",
+    "mocha": "^3.0.2"
+  }
+}
