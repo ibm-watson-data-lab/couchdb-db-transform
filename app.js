@@ -51,40 +51,48 @@ if((! process.env.SOURCE_COUCH_DB_URL) || (!process.env.TARGET_COUCH_DB_URL)) {
     process.exit(1);
 }
 
-
-
 var r = new R(mutil.splitUrl(process.env.SOURCE_COUCH_DB_URL), 
 			        mutil.splitUrl(process.env.TARGET_COUCH_DB_URL),
               mutil.isTrue(process.env.RESTART));
 
-var appEnv = null;
+r.init(function(err) {
 
-try {
-  appEnv = cfenv.getAppEnv({vcap: {services: require('./vcap_services.json')}});
-}
-catch(ex) {
-  appEnv = cfenv.getAppEnv();
-}
+  if(err) {
+    console.error('The service could not be initialized: ' + err);
+    process.exit(1);
+  }
 
-var app = express();
-app.use(bodyParser.urlencoded({extended: false}));
+  var appEnv = null;
 
-if(! process.env.HIDE_CONSOLE) {
-	// replication status endpoint
-	app.get('/status', function(req,res) {
-		console.log('System status:' + JSON.stringify(r.getStatus())); 		  
-		res.status(200).jsonp({status_date: Date(), status: r.getStatus()});		
-	});		
-}
+  try {
+    appEnv = cfenv.getAppEnv({vcap: {services: require('./vcap_services.json')}});
+  }
+  catch(ex) {
+    appEnv = cfenv.getAppEnv();
+  }
 
-// start server on the specified port and binding host
-app.listen(appEnv.port, '0.0.0.0', function() {
-    console.log('Server starting on ' + appEnv.url);
-    if(! process.env.HIDE_CONSOLE) {
-    	console.log('Status information is made available at ' + appEnv.url + '/status');
-    	console.log('To disable status output, set environment variable HIDE_CONSOLE to true and restart the application.');
-    }
+  var app = express();
+  app.use(bodyParser.urlencoded({extended: false}));
+
+  if(! process.env.HIDE_CONSOLE) {
+    // replication status endpoint
+    app.get('/status', function(req,res) {
+      console.log('System status:' + JSON.stringify(r.getStatus()));      
+      res.status(200).jsonp({status_date: Date(), status: r.getStatus()});    
+    });   
+  }
+
+  // start server on the specified port and binding host
+  app.listen(appEnv.port, '0.0.0.0', function() {
+      console.log('Server starting on ' + appEnv.url);
+      if(! process.env.HIDE_CONSOLE) {
+        console.log('Status information is made available at ' + appEnv.url + '/status');
+        console.log('To disable status output, set environment variable HIDE_CONSOLE to true and restart the application.');
+      }
+  });
+
 });
+
 
 // send sample application deployment tracking request to https://github.com/IBM-Bluemix/cf-deployment-tracker-service
 //require('cf-deployment-tracker-client').track();
