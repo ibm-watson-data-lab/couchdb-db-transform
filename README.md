@@ -31,13 +31,9 @@ Custom transformation functions can be used to selectively modify source documen
  * @returns {Object} - the transformed document
  */
 module.exports = function(doc) {
-
 	if(doc) {
-
 		doc.timestamp = new Date().toISOString();
-
 	}
-	
 	return doc;
 };
 ```
