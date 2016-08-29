@@ -10,8 +10,6 @@ Inspired by [couchimport](https://www.npmjs.com/package/couchimport).
 
 ## Getting started
 
-### Run the service in Bluemix
-
 #### Clone the repository
 
 ```
@@ -19,7 +17,7 @@ $ git clone https://github.com/ibm-cds-labs/couchdb-db-transform.git
 $ cd couchdb-db-transform
 ```
 
-#### Optional: Implement a custom transformation function
+#### Implement a custom transformation function
 
 Custom transformation functions can be used to selectively modify source documents before they are saved in the target database.
 [Example transformation function that adds a timestamp to each document](https://github.com/ibm-cds-labs/couchdb-db-transform/blob/master/sample_transform_functions/add_timestamp_property.js):
@@ -38,18 +36,21 @@ module.exports = function(doc) {
 };
 ```
 
-#### Deploy the service
+> Use the native replication feature instead of this service if no document transformation needs to be performed.
+
+You can run this service in [Bluemix](https://github.com/ibm-cds-labs/couchdb-db-transform#deploy-the-service-in-bluemix) or [locally](https://github.com/ibm-cds-labs/couchdb-db-transform#run-the-service-locally).
+
+### Deploy the service in Bluemix
 
 ```
 $ cf push --no-start
 ```
 
-
-### Configure the service
+#### Configure the service
 
 Before the service can be used you have to identify the source database, the target database and the (optionally) the transformation function.
 
-#### Define the source and target databases
+##### Define the source and target databases
 
 ```
 $ cf set-env couchdb-db-copy-and-transform-service SOURCE_COUCH_DB_URL https://$USERNAME:$PASSWORD@$REMOTE_USERNAME.cloudant.com/$SOURCE_DATABASE_NAME
@@ -60,7 +61,7 @@ $ cf set-env couchdb-db-copy-and-transform-service TARGET_COUCH_DB_URL https://$
 
 > Note: the service creates a small repository database named `transform_` in the target CouchDB instance. [Learn more ...](https://github.com/ibm-cds-labs/couchdb-db-transform/wiki/Repository-database-overview)
 
-#### Declare the transformation function
+##### Declare the transformation function
 
 Declare the transformation function by setting environment variable `TRANSFORM_FUNCTION`.
 
@@ -71,7 +72,7 @@ $ cf set-env couchdb-db-copy-and-transform-service TRANSFORM_FUNCTION </path/to/
 > Simple example transformation functions are located in the [`sample_transform_functions`](https://github.com/ibm-cds-labs/couchdb-db-transform/blob/master/sample_transform_functions/) directory.
 
 
-#### Start the service
+##### Start the service
 
 ```
 $ cf start couchdb-db-copy-and-transform-service
@@ -80,12 +81,11 @@ $ cf logs couchdb-db-copy-and-transform-service --recent
 ```
 
 Once started, the service will listen to the change feed of the source database. When the service is started for the first time, all changes that occurred in the past will be captured. If the service is restarted only documents that have not yet been processed will be retrieved, transformed and stored in the target database. 
-
 > Set environment variable `RESTART` to `true` to always fetch all documents. Note that the service _does not_ delete existing documents in the target database.
 
 > The service terminates immediately if the `SOURCE_COUCH_DB_URL` or `TARGET_COUCH_DB_URL` environment variables are not defined, if the specified `TRANSFORM_FUNCTION` cannot be loaded or if it causes an error during processing.
 
-#### Monitor the service status
+##### Monitor the service status
 
 This service provides a basic service status console. 
 
@@ -95,11 +95,9 @@ Example: `https://couchdb-db-copy-and-transform-service.mybluemix.net/status`
 
 > To disable the console, set environment variable `HIDE_CONSOLE` to `true`.
 
-### Run the service locally
+## Run the service locally
 
 ```
-$ git clone https://github.com/ibm-cds-labs/couchdb-db-transform.git
-$ cd couchdb-db-transform
 $ npm install
   ...
 $ export SOURCE_COUCH_DB_URL=https://$USERNAME:$PASSWORD@$REMOTE_USERNAME.cloudant.com/$SOURCE_DATABASE_NAME
