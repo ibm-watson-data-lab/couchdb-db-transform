@@ -58,7 +58,8 @@ var r = new R(mutil.splitUrl(process.env.SOURCE_COUCH_DB_URL),
 r.init(function(err) {
 
   if(err) {
-    console.error('The service could not be initialized: ' + err);
+    console.error('Error. The service could not be initialized: ' + err);
+    console.error('Terminating.');
     process.exit(1);
   }
 
