@@ -26,7 +26,7 @@ Custom filter functions can be used to limit the number of source documents that
 
 Server-side filters are applied by CouchDB and determine which documents are included in the change feed that the service subscribes to. Use this type of filter in scenarios where a significant number of documents can be excluded to reduce the network traffic between the database and the service. 
 
-Server-side filters are defined in [design documents](https://github.com/ibm-cds-labs/couchdb-db-transform/blob/master/sample_filter_design_docs/server-side-filter-design-doc.json) in the source database. 
+Server-side filters are defined in [design documents](https://github.com/ibm-cds-labs/couchdb-db-transform/blob/master/sample_filter_design_docs/server_side_filter_design_doc.json) in the source database. 
 
 Example of a design document that defines a filter for deleted documents:
 
@@ -45,7 +45,7 @@ Example of a design document that defines a filter for deleted documents:
 
 Client-side filters are applied by the service and determine which documents will be passed to the transformation routine and subsequently stored in the target database. These filters are implemented in Node.JS and deployed with the service.
 
-[Example filter function that excludes design documents](https://github.com/ibm-cds-labs/couchdb-db-transform/blob/i1/sample_filter_functions/ignore_design_documents.js):
+[Example filter function that excludes design documents](https://github.com/ibm-cds-labs/couchdb-db-transform/blob/master/sample_filter_functions/ignore_design_documents.js):
 
 ```
 /*
