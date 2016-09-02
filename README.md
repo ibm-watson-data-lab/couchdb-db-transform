@@ -2,11 +2,11 @@
 
 ![build status](https://travis-ci.org/ibm-cds-labs/couchdb-db-transform.svg?branch=master)
 
-Copies documents from one CouchDB database to another CouchDB database, applying one or more optionally configured transformations to the documents.
+Copies documents from one CouchDB database to another CouchDB database, applying one or more optionally configured filter and transformation operations to the documents.
 
 ![Overview](https://raw.githubusercontent.com/ibm-cds-labs/couchdb-db-transform/master/media/flow.png)
 
-Inspired by [couchimport](https://www.npmjs.com/package/couchimport).
+Inspired by [couchimport](https://www.npmjs.com/package/couchimport) and built on CouchDB's change feed.
 
 ## Getting started
 
@@ -17,9 +17,55 @@ $ git clone https://github.com/ibm-cds-labs/couchdb-db-transform.git
 $ cd couchdb-db-transform
 ```
 
-#### Implement a custom transformation function
+#### Custom filter function
 
-Custom transformation functions can be used to selectively modify source documents before they are saved in the target database.
+Custom filter functions can be used to limit the number of source documents that will be stored in the target database. Two types of filters are supported: _server-side_ and _client-side_.
+
+
+##### Server-side filters
+
+Server-side filters are applied by CouchDB and determine which documents are included in the change feed that the service subscribes to. Use this type of filter in scenarios where a significant number of documents can be excluded to reduce the network traffic between the database and the service. 
+
+Server-side filters are defined in [design documents](https://github.com/ibm-cds-labs/couchdb-db-transform/blob/master/sample_filter_design_docs/server-side-filter-design-doc.json) in the source database. 
+
+Example of a design document that defines a filter for deleted documents:
+
+```
+{
+  "_id": "_design/transform_service",
+  "filters": {
+    "exclude_deleted_docs": "function(doc, req) { if(doc._deleted) { return false; }  else { return true; }}"
+  },
+  "language": "javascript"
+}
+
+```
+
+##### Client-side filters
+
+Client-side filters are applied by the service and determine which documents will be passed to the transformation routine and subsequently stored in the target database. These filters are implemented in Node.JS and deployed with the service.
+
+[Example filter function that excludes design documents](https://github.com/ibm-cds-labs/couchdb-db-transform/blob/i1/sample_filter_functions/ignore_design_documents.js):
+
+```
+/*
+ * Filter function that excludes design documents.
+ * @param {Object} change - a document change that was received in the change feed
+ * @returns {Boolean} - true if the document is not a design document, false otherwise
+ */
+module.exports = function(change) {
+  if((! change) || (! change.doc) || (change.doc._id.startsWith('_design/'))) {
+    return false;
+  }
+  else {
+    return true;
+  }
+};
+```
+
+#### Custom transformation functions
+
+Custom transformation are used to selectively modify source documents before they are saved in the target database. Like client-side filters, transformation scripts are implemented in Node.JS and are deployed with the service.
 [Example transformation function that adds a timestamp to each document](https://github.com/ibm-cds-labs/couchdb-db-transform/blob/master/sample_transform_functions/add_timestamp_property.js):
 
 ```
@@ -36,7 +82,7 @@ module.exports = function(doc) {
 };
 ```
 
-> Use the native replication feature instead of this service if no document transformation needs to be performed.
+> If performance is critical, use CouchDB's replication instead of this service to simply synchronize two databases.
 
 You can run this service in [Bluemix](https://github.com/ibm-cds-labs/couchdb-db-transform#deploy-the-service-in-bluemix) or [locally](https://github.com/ibm-cds-labs/couchdb-db-transform#run-the-service-locally).
 
@@ -61,16 +107,41 @@ $ cf set-env couchdb-db-copy-and-transform-service TARGET_COUCH_DB_URL https://$
 
 > Note: the service creates a small repository database named `transform_` in the target CouchDB instance. [Learn more ...](https://github.com/ibm-cds-labs/couchdb-db-transform/wiki/Repository-database-overview)
 
-##### Declare the transformation function
+##### Register the filter functions
 
-Declare the transformation function by setting environment variable `TRANSFORM_FUNCTION`.
+To enable filtering define environment variables `SERVER_FILTER` and/or `CLIENT_FILTER`. The value assigned to `SERVER_FILTER` must identify an existing filter definition in an existing view in the database identified by `SOURCE_COUCH_DB_URL`. The value assigned to `CLIENT_FILTER` must identify an existing Node.JS script that's deployed with the service.
+
+```
+$ cf set-env couchdb-db-copy-and-transform-service SERVER_FILTER <view/filter_name>
+$ cf set-env couchdb-db-copy-and-transform-service CLIENT_FILTER </path/to/custom_filter_function.js>
+```
+
+> Examples:
+> _Register a server-side filter named `exclude_deleted_docs` that is defined in design document `transform_service`._
+  ```
+  $ cf set-env couchdb-db-copy-and-transform-service SERVER_FILTER transform_service/exclude_deleted_docs
+  ```
+
+> _Register a client-side filter named `exclude_design_docs` that is defined in `sample_filter_functions/ignore_design_documents.js`._
+  ```
+  $ cf set-env couchdb-db-copy-and-transform-service CLIENT_FILTER sample_filter_functions/ignore_design_documents.js
+  ```
+
+> The service does not start if any problems are found with the filter definitions.
+
+##### Register transformation functions
+
+Register a transformation function by setting environment variable `TRANSFORM_FUNCTION`.
 
 ```
 $ cf set-env couchdb-db-copy-and-transform-service TRANSFORM_FUNCTION </path/to/custom_transform_function.js>
 ```
 
-> Simple example transformation functions are located in the [`sample_transform_functions`](https://github.com/ibm-cds-labs/couchdb-db-transform/blob/master/sample_transform_functions/) directory.
-
+> Example:
+> _Register transformation function `add_timestamp_property.js` that is located in the service's `sample_transform_functions` directory._
+  ```
+  $ cf set-env couchdb-db-copy-and-transform-service TRANSFORM_FUNCTION sample_transform_functions/add_timestamp_property.js
+  ```
 
 ##### Start the service
 
@@ -83,7 +154,9 @@ $ cf logs couchdb-db-copy-and-transform-service --recent
 Once started, the service will listen to the change feed of the source database. When the service is started for the first time, all changes that occurred in the past will be captured. If the service is restarted only documents that have not yet been processed will be retrieved, transformed and stored in the target database. 
 > Set environment variable `RESTART` to `true` to always fetch all documents. Note that the service _does not_ delete existing documents in the target database.
 
-> The service terminates immediately if the `SOURCE_COUCH_DB_URL` or `TARGET_COUCH_DB_URL` environment variables are not defined, if the specified `TRANSFORM_FUNCTION` cannot be loaded or if it causes an error during processing.
+> The service terminates immediately if the `SOURCE_COUCH_DB_URL` or `TARGET_COUCH_DB_URL` environment variables are not defined or if the specified filter and/or tranform functions cannot be validated or cause an error during processing.
+
+> You can restart the service after the problem has been addressed. Document processing will resume at the point of failure. [Learn more ...](https://github.com/ibm-cds-labs/couchdb-db-transform/wiki/Repository-database-overview)
 
 ##### Monitor the service status
 
@@ -102,7 +175,9 @@ $ npm install
   ...
 $ export SOURCE_COUCH_DB_URL=https://$USERNAME:$PASSWORD@$REMOTE_USERNAME.cloudant.com/$SOURCE_DATABASE_NAME
 $ export TARGET_COUCH_DB_URL=https://$USERNAME:$PASSWORD@$REMOTE_USERNAME.cloudant.com/$TARGET_DATABASE_NAME
-$ export TRANSFORM_FUNCTION=sample_transform_functions/no_transformation.js
+$ export SERVER_FILTER=transform_service/exclude_deleted_docs
+$ export CLIENT_FILTER=sample_filter_functions/ignore_design_documents.js
+$ export TRANSFORM_FUNCTION=sample_transform_functions/add_timestamp_property.js
 $ node app.js
   ...
 ```

@@ -1,6 +1,6 @@
 {
   "name": "couchdb-db-transform",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Fetches documents from one couchdb database, optionally transforms them and inserts them into target database",
   "main": "app.js",
   "scripts": {
