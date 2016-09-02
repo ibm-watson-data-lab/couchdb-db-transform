@@ -1,0 +1,8 @@
+{
+  "_id": "_design/transform_service",
+  "filters": {
+    "exclude_deleted_docs": "function(doc, req) { if(doc._deleted) { return false; }  else { return true; }}",
+    "exclude_design_docs": "function(doc, req) { if(doc._id.startsWith('_design/')) { return false; }  else { return true; }}"
+  },
+  "language": "javascript"
+}

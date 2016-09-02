@@ -16,12 +16,13 @@
 
 'use strict';
 
+const consts = require('./lib/consts.js');
 const cfenv = require('cfenv');
 const express = require('express');
 const bodyParser = require('body-parser');
 
 // to enable debugging, set environment variable DEBUG to slack-about-service or *
-const debug = require('debug')('cloudant-replication-cleansing');
+const debug = require('debug')(consts.appPrefix);
 
 var R = require('./lib/replicate.js');
 const mutil = require('./lib/util.js');
@@ -33,12 +34,14 @@ const mutil = require('./lib/util.js');
  *  - TARGET_COUCH_DB_URL: https://$USERNAME:$PASSWORD@$REMOTE_USERNAME.cloudant.com/$TARGET_DATABASE_NAME
  *  - RESTART (optional, default is false): if true, the change feed will process all document changes since the database was created; otherwise 
  *      only new document changes will be processed
- *  - TRANSFORM_FUNCTION (optional, default no transformation): file containing the Javascript routine to be used to transform documents 
+ *  - TRANSFORM_FUNCTION (optional, default no transformation): file containing the Javascript routine to be used to transform documents
+ *  - SERVER_FILTER (optional, no default): name of an existing filter in the source database, expressed as "$DESIGN_DOC_NAME/$FILTER_NAME"
+ *  - CLIENT_FILTER (optional, no default): name of a file in the application directory containing a filter function: $PATH_TO/$FILTER_FUNCTION_FILE_NAME
  *  - HIDE_CONSOLE (optional, default false): disables all API endpoints
- *  - DEBUG (optional): if set to * or slack-about-service, debug information is added to the log
+ *  - DEBUG (optional): if set to * or $APP_PREFIX:$MODULE, debug information is added to the log
  */
 
-	debug('cloudant-replication-cleansing: debug is enabled.');
+	debug(consts.appPrefix + ': debug is enabled.');
 
 /*
  * Verify that the application was properly configured 
@@ -58,8 +61,9 @@ var r = new R(mutil.splitUrl(process.env.SOURCE_COUCH_DB_URL),
 r.init(function(err) {
 
   if(err) {
-    console.error('Error. The service could not be initialized: ' + err);
-    console.error('Terminating.');
+    console.error('Error. Service initialization failed: ' + err);
+    console.error('Check the log file for additional information.');
+    console.error('The service is stopping.');
     process.exit(1);
   }
 
