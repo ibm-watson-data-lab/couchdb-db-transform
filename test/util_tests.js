@@ -4,7 +4,7 @@ const util = require('../lib/util.js');
 
 var expectedResult = null;
 
- describe('util', function() {
+ describe('lib/util', function() {
   describe('#isTrue()', function() {
     it('should return false when the value is not present', function() {
       assert.equal(false, util.isTrue());
@@ -85,6 +85,11 @@ var expectedResult = null;
       assert.equal(null, util.splitUrl('somegarbageinputthatis not a url'));
     });
   });
+  describe('#splitUrl(\'http://localhost:5984/crimes\')', function() {
+    it('should return {url: \'http://localhost:5984\', dbname: \'crimes\'}', function() {
+      assert.equal(JSON.stringify({url: 'http://localhost:5984', dbname: 'crimes'}), JSON.stringify(util.splitUrl('http://localhost:5984/crimes')));
+    });
+  });
   describe('#splitUrl(\'https://c6421366-5972-user:p0a1s2s3w4o5r6d@c6421366-5972-user-bluemix.cloudant.com/\')', function() {
     it('should return null when the URL ends with /', function() {
       assert.equal(null, util.splitUrl('https://c6421366-5972-user:p0a1s2s3w4o5r6d@c6421366-5972-user-bluemix.cloudant.com/'));
@@ -127,5 +132,33 @@ var expectedResult = null;
       assert.equal(expectedResult, JSON.stringify(util.getCredentialsWithoutPassword({url:'https://c6421366-5972-user:p0a1s2s3w4o5r6d@c6421366-5972-user-bluemix.cloudant.com', dbname: 'source'})));
     });
   });
+  describe('#getCredentialsWithoutPassword({url:\'http://localhost:5984\', dbname: \'crimes\'})', function() {
+    it('should return the same URL when no authorization information is present', function() {
+      assert.equal(JSON.stringify({url:'http://localhost:5984/', dbname: 'crimes'}), JSON.stringify(util.getCredentialsWithoutPassword({url:'http://localhost:5984', dbname: 'crimes'})));
+    });
+  });
 });
 
+//
+// getUrlWithoutPassword
+//
+  describe('#getUrlWithoutPassword()', function() {
+    it('should return null when the value is not present', function() {
+      assert.equal(null, util.getUrlWithoutPassword());
+    });
+  });
+  describe('#getUrlWithoutPassword(\'https://c6421366-5972-user:p0a1s2s3w4o5r6d@c6421366-5972-user-bluemix.cloudant.com\')', function() {
+    it('should return https://c6421366-5972-user@c6421366-5972-user-bluemix.cloudant.com/ for URL https://c6421366-5972-user:p0a1s2s3w4o5r6d@c6421366-5972-user-bluemix.cloudant.com', function() {
+      assert.equal('https://c6421366-5972-user@c6421366-5972-user-bluemix.cloudant.com/', util.getUrlWithoutPassword('https://c6421366-5972-user:p0a1s2s3w4o5r6d@c6421366-5972-user-bluemix.cloudant.com'));
+    });
+  });
+  describe('#getUrlWithoutPassword(\'https://c6421366-5972-user:p0a1s2s3w4o5r6d@c6421366-5972-user-bluemix.cloudant.com\')', function() {
+    it('should return https://c6421366-5972-user@c6421366-5972-user-bluemix.cloudant.com/ for URL https://c6421366-5972-user:p0a1s2s3w4o5r6d@c6421366-5972-user-bluemix.cloudant.com/', function() {
+      assert.equal('https://c6421366-5972-user@c6421366-5972-user-bluemix.cloudant.com/', util.getUrlWithoutPassword('https://c6421366-5972-user:p0a1s2s3w4o5r6d@c6421366-5972-user-bluemix.cloudant.com/'));
+    });
+  });
+  describe('#getUrlWithoutPassword(http://localhost:5984/crimes)', function() {
+    it('should return the same URL when no authorization information is present', function() {
+      assert.equal('http://localhost:5984/crimes', util.getUrlWithoutPassword('http://localhost:5984/crimes'));
+    });
+  });

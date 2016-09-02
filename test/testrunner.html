@@ -7,7 +7,7 @@
 <body>
   <div id="mocha"></div>
   <script src="../node_modules/mocha/mocha.js"></script>
-  <script src="../node_modules/chai/chai.js"></script>
+  <!-- <script src="../node_modules/chai/chai.js"></script> -->
 
   <script>
     mocha.setup('bdd')
@@ -15,8 +15,7 @@
   </script>
 
   <!-- Tests -->
-  <script src="tests.js"></script>
-  <script src="util_tests.js"></script>
+  <script src="./util_tests.js"></script>
 
   <script>
     // Only tests run in real browser, injected script run if options.run == true
