@@ -18,9 +18,9 @@ module.exports = function (grunt) {
         requireCurlyBraces: [ "if" ]
       }
     },
-    mocha: {
-      all: {
-        src: ["tests/testrunner.html"]
+    simplemocha: {
+      test: {
+        src: ["test/*.js"]
       },
       options: {
         run:true
@@ -30,8 +30,8 @@ module.exports = function (grunt) {
 
   grunt.loadNpmTasks("grunt-contrib-jshint");
   grunt.loadNpmTasks("grunt-jscs");
-  grunt.loadNpmTasks("grunt-mocha");
+  grunt.loadNpmTasks('grunt-simple-mocha');
 
-  grunt.registerTask("default", [ "lint", "jscs", "mocha" ]);
+  grunt.registerTask("default", [ "lint", "jscs", "simplemocha" ]);
   grunt.registerTask("lint", "Check for common code problems.", [ "jshint" ]);
 };
