@@ -143,6 +143,27 @@ $ cf set-env couchdb-db-copy-and-transform-service TRANSFORM_FUNCTION </path/to/
   $ cf set-env couchdb-db-copy-and-transform-service TRANSFORM_FUNCTION sample_transform_functions/add_timestamp_property.js
   ```
 
+##### Hide or secure the service status endpoint
+
+The service provides a `/status` endpoint that can be used to monitor the current service state.
+
+##### Hide the service status endpoint
+
+To disable the endpoint set environment variable `HIDE_CONSOLE` to `true`.
+
+```
+$ cf set-env couchdb-db-copy-and-transform-service HIDE_CONSOLE true
+```
+
+##### Secure the service status endpoint
+
+To secure the endpoint, define environment variables `CONSOLE_USER` and `CONSOLE_PASSWORD` and assign the desired values.
+
+```
+$ cf set-env couchdb-db-copy-and-transform-service CONSOLE_USER <console_user>
+$ cf set-env couchdb-db-copy-and-transform-service CONSOLE_PASSWORD <console_user_password>
+```
+
 ##### Start the service
 
 ```
@@ -160,13 +181,47 @@ Once started, the service will listen to the change feed of the source database.
 
 ##### Monitor the service status
 
-This service provides a basic service status console. 
-
-Launch a web browser and open the servide status page `<service-url>/status`, replacing `<service_url>` with the URL that was assigned to your service instance.
+If the service status endpoint is enabled (default), direct your browser to `<service-url>/status`, replacing `<service_url>` with the URL that was assigned to your service instance.
 
 Example: `https://couchdb-db-copy-and-transform-service.mybluemix.net/status`
 
-> To disable the console, set environment variable `HIDE_CONSOLE` to `true`.
+If prompted, enter the values configured for `CONSOLE_USER` and `CONSOLE_PASSWORD`.
+
+```
+{
+  status_date: "Thu Sep 08 2016 10:53:44 GMT-0700 (Pacific Daylight Time)",
+  service_status: {
+    source: {
+      database_name: "sample_source",
+      last_change_received: "Thu Sep 08 2016 10:53:41 GMT-0700 (Pacific Daylight Time)",
+      update_seq: "1206002-g1AAAAI..."
+    },
+    target: {
+      database_name: "sample_target",
+      last_applied_update_seq: "103500-g1AAAA..",
+      copied: 3000,
+      failed: 0,
+      last_change_applied: "Thu Sep 08 2016 10:53:42 GMT-0700 (Pacific Daylight Time)"
+    },
+    filter: {
+      server: {
+        name: "transform_service/exclude_deleted_docs",
+        definition: "..."
+      },
+      client: {
+        name: "sample_filter_functions/ignore_design_documents.js",
+        definition: "...",
+        filtered: 3
+      }
+    },
+    transformer: {
+      name: "sample_transform_functions/add_timestamp_property.js",
+      definition: "..."
+    }
+  }
+}
+```
+
 
 ## Run the service locally
 

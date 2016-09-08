@@ -1,6 +1,6 @@
 {
   "name": "couchdb-db-transform",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Fetches documents from one couchdb database, optionally transforms them and inserts them into target database",
   "main": "app.js",
   "scripts": {
@@ -30,6 +30,9 @@
     "express": "^4.14.0",
     "fs": "0.0.2",
     "lodash": "^4.15.0",
+    "passport": "^0.3.2",
+    "passport-anonymous": "^1.0.1",
+    "passport-http": "^0.3.0",
     "path": "^0.12.7",
     "redis": "^2.6.2",
     "util": "^0.10.3"

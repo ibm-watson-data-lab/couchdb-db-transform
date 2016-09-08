@@ -20,12 +20,14 @@ const consts = require('./lib/consts.js');
 const cfenv = require('cfenv');
 const express = require('express');
 const bodyParser = require('body-parser');
+const passport = require('passport');
 
 // to enable debugging, set environment variable DEBUG to slack-about-service or *
 const debug = require('debug')(consts.appPrefix);
 
 var R = require('./lib/replicate.js');
 const mutil = require('./lib/util.js');
+const security = require('./lib/security.js');
 
 /*
  * 
@@ -79,14 +81,19 @@ r.init(function(err) {
   var app = express();
   app.use(bodyParser.urlencoded({extended: false}));
 
+  console.log('Console security is set to: "' + security.strategyName + '"');
+  passport.use(security.strategy);
+
   if(! process.env.HIDE_CONSOLE) {
     // replication status endpoint
-    app.get('/status', function(req,res) {
-      r.getDetailedStatus(function(err, status) {
-        console.log('Service status:' + JSON.stringify(status, null, 1));      
-        res.status(200).json(status);    
-      });
-    });   
+    app.get('/status', 
+            passport.authenticate(security.strategyName, {session:false}),
+            function(req,res) {
+              r.getDetailedStatus(function(err, status) {
+                console.log('Service status:' + JSON.stringify(status, null, 1));      
+                res.status(200).json(status);    
+              });
+            });   
   }
 
   // start server on the specified port and binding host
@@ -99,7 +106,6 @@ r.init(function(err) {
   });
 
 });
-
 
 // send sample application deployment tracking request to https://github.com/IBM-Bluemix/cf-deployment-tracker-service
 //require('cf-deployment-tracker-client').track();
