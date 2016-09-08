@@ -82,8 +82,10 @@ r.init(function(err) {
   if(! process.env.HIDE_CONSOLE) {
     // replication status endpoint
     app.get('/status', function(req,res) {
-      console.log('System status:' + JSON.stringify(r.getStatus()));      
-      res.status(200).jsonp({status_date: Date(), status: r.getStatus()});    
+      r.getDetailedStatus(function(err, status) {
+        console.log('Service status:' + JSON.stringify(status, null, 1));      
+        res.status(200).json(status);    
+      });
     });   
   }
 
