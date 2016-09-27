@@ -26,6 +26,7 @@
     "cfenv": "^1.0.3",
     "cloudant": "^1.4.3",
     "debug": "^2.2.0",
+    "cf-deployment-tracker-client": "^0.x",
     "events": "^1.1.1",
     "express": "^4.14.0",
     "fs": "0.0.2",
