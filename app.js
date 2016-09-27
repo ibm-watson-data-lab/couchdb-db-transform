@@ -108,4 +108,4 @@ r.init(function(err) {
 });
 
 // send sample application deployment tracking request to https://github.com/IBM-Bluemix/cf-deployment-tracker-service
-//require('cf-deployment-tracker-client').track();
+require('cf-deployment-tracker-client').track();
