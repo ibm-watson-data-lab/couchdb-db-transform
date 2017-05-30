@@ -6,7 +6,9 @@
   "scripts": {
     "start": "node app.js",
     "test": "grunt",
-    "tests-unit": "grunt"
+    "tests-unit": "grunt",
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
   },
   "repository": {
     "type": "git",
@@ -36,7 +38,8 @@
     "passport-http": "^0.3.0",
     "path": "^0.12.7",
     "redis": "^2.6.2",
-    "util": "^0.10.3"
+    "util": "^0.10.3",
+    "snyk": "^1.31.1"
   },
   "devDependencies": {
     "assert": "^1.4.1",
@@ -47,5 +50,6 @@
     "grunt-simple-mocha": "^0.4.1",
     "jshint": "2.8.0",
     "mocha": "^3.0.2"
-  }
+  },
+  "snyk": true
 }
